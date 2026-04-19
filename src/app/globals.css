@@ -1,0 +1,142 @@
+@import "tailwindcss";
+
+:root {
+  /* Blassalism v3 — Light base, deep purple wave */
+  --blass-base: #FFFFFF;
+  --blass-wave: rgba(90, 79, 207, 0.4);
+  --blass-surface: rgba(232, 237, 255, 0.3);
+  --blass-accent: #2462EB;
+
+  /* Glass Effects */
+  --glass-light: linear-gradient(116.79deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.12) 99.45%);
+  --glass-blur: blur(10px);
+
+  /* Text Colors */
+  --text-primary: #000000;
+  --text-value: #424652;
+  --text-body: #6E727B;
+  --text-secondary: #5E5E5E;
+  --text-muted: #ADB1B8;
+  --text-activity-heading: #50545D;
+  --text-activity-company: #646668;
+  --text-white: #FFFFFF;
+
+  /* Deadline Colors */
+  --deadline-urgent: #E35555;
+  --deadline-warning: #E19443;
+  --deadline-safe: #53BA77;
+
+  /* Badge Colors */
+  --badge-paid-bg: #DBFCE6;
+  --badge-paid-text: #48895F;
+  --badge-sent-bg: #DAE9FE;
+  --badge-sent-border: #AAAEB6;
+  --badge-sent-text: #5C77C8;
+  --badge-overdue-bg: #FDE1E2;
+  --badge-overdue-text: #B65656;
+
+  /* Borders */
+  --border-color: #000000;
+  --border-subtle: #646668;
+  --activity-separator: #49494F;
+
+  --background: var(--blass-base);
+  --foreground: #000000;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--blass-base);
+  color: var(--foreground);
+  font-family: 'Inter', var(--font-inter), system-ui, sans-serif;
+}
+
+/* Blassalism Glass Card */
+.glass-card {
+  background: var(--glass-light);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: 8px;
+}
+
+.glass-card-heavy {
+  background: var(--glass-light);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-width: 1px 10px 10px 1px;
+  border-style: solid;
+  border-color: var(--border-color);
+  border-radius: 8px;
+}
+
+/* Neo-brutalist Button Borders */
+.blass-btn {
+  background: var(--glass-light);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-width: 1px 4px 4px 1px;
+  border-style: solid;
+  border-color: var(--border-color);
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.blass-btn:hover {
+  border-width: 1px 2px 2px 1px;
+  transform: translate(2px, 2px);
+}
+
+.blass-btn:active {
+  border-width: 1px 1px 1px 1px;
+  transform: translate(3px, 3px);
+}
+
+/* Flat glass button (1px border only) */
+/* Selected/active state — solid muted background, flat border */
+.blass-btn-selected {
+  background: rgba(245, 245, 245, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+/* Flat glass button (1px border only) */
+.blass-btn-flat {
+  background: var(--glass-light);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.blass-btn-flat:hover {
+  opacity: 0.85;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
