@@ -3,11 +3,11 @@ import { Sidebar } from '@/components/Sidebar'
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen relative" style={{ background: '#FFFFFF' }}>
-      {/* Background wave overlay — soft lavender wash */}
+      {/* Background wave overlay — warm gold wash with heavy blur */}
       <div
         className="absolute inset-0 z-0"
         style={{
-          background: 'rgba(90, 79, 207, 0.4)',
+          background: 'rgba(232, 216, 176, 0.5)',
           backdropFilter: 'blur(30px)',
           WebkitBackdropFilter: 'blur(30px)',
         }}

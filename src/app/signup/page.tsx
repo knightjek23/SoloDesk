@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { Briefcase } from 'lucide-react'
 import { signup } from '../login/actions'
 
 export default async function SignupPage({
@@ -12,9 +11,11 @@ export default async function SignupPage({
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md">
-        <div className="flex items-center justify-center gap-2 mb-8">
-          <Briefcase className="w-6 h-6 text-black" />
-          <span className="text-2xl text-black" style={{ fontWeight: 200, letterSpacing: '0.02em' }}>
+        <div className="flex items-center justify-center mb-8">
+          <span
+            className="text-[28px] text-black"
+            style={{ fontFamily: 'var(--font-heading)', fontWeight: 400, letterSpacing: '0.02em' }}
+          >
             SoloDesk
           </span>
         </div>

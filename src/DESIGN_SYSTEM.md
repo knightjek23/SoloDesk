@@ -1,6 +1,6 @@
-# SoloDesk Design System
+# SoloDesk Design System — Blassalism v4
 
-> "Blassalism" — Glass-forward, neo-brutalist depth, clean typography.
+> Warm gold sidebar, cool blue content, glassmorphism everywhere, serif headings.
 
 ---
 
@@ -9,121 +9,133 @@
 ### Typography
 | Token | Value | Usage |
 |-------|-------|-------|
-| Font Family | `Inter`, system-ui fallback | All UI text |
-| Body | 12px / 15px, weight 400 | Buttons, labels, table cells |
-| Stats Value | 20px, weight 600 | Dashboard stat numbers |
-| Small Label | 11px, weight 400 | Stat titles, trend labels |
+| `--font-heading` | `Playfair Display`, Georgia, serif | Wordmark, page headings, greeting |
+| `--font-body` | `Inter`, system-ui | Everything else |
+| Wordmark | Playfair 24px, weight 400, `letter-spacing: 0.02em` | Sidebar brand |
+| Page greeting | Playfair 25px, weight 400, color `#2C313E` | "Good morning, Josh" |
+| Date subtitle | Inter 13px, weight 400, color `#9EA3AC` | Below greeting |
+| Nav items | Inter 12px, weight 400, color `#000000` | Sidebar links |
+| Section title | Inter 16-17px, weight 400, color `#50545D` | "Recent Invoices", "Activity Feed" |
+| Stat label | Inter 11px, weight 400, color `#000000` | Card titles |
+| Stat value | Inter 20px, weight 600, color `#424652` | Card numbers |
+| Stat trend | Inter 11px, weight 400, color `#5E5E5E` | "+1 this month" |
+| Table text | Inter 10-12px, weight 300-400 | Invoice rows, deadlines |
 
 ### Color Tokens
 | Token | Value | Usage |
 |-------|-------|-------|
 | `--blass-base` | `#FFFFFF` | Page background |
-| `--blass-wave` | `rgba(90, 79, 207, 0.4)` | Purple accent wave |
-| `--blass-surface` | `rgba(232, 237, 255, 0.3)` | Subtle surface tint |
+| `--blass-nav` | `rgba(232, 216, 176, 0.5)` | Sidebar + wave overlay (warm gold) |
+| `--blass-surface` | `rgba(232, 237, 255, 0.3)` | Main content area (cool blue) |
 | `--blass-accent` | `#2462EB` | Primary action blue |
-| `--text-primary` | `#000000` | Headings, button labels |
-| `--text-value` | `#424652` | Stat values, emphasis text |
-| `--text-body` | `#6E727B` | Body text |
-| `--text-secondary` | `#5E5E5E` | Secondary info |
-| `--text-muted` | `#ADB1B8` | Placeholder, disabled |
-| `--border-color` | `#000000` | Primary borders |
-| `--border-subtle` | `#646668` | Secondary borders |
+| `--blass-accent-60` | `rgba(36, 98, 235, 0.6)` | "New Invoice" button bg |
+| `--text-heading` | `#2C313E` | Playfair headings |
+| `--text-primary` | `#000000` | Nav labels, bold text |
+| `--text-value` | `#424652` | Stat numbers |
+| `--text-body` | `#6E727B` | Deadline project names |
+| `--text-secondary` | `#5E5E5E` | Trend labels |
+| `--text-date` | `#9EA3AC` | Date subtitles |
+| `--text-muted` | `#ADB1B8` | Client names in deadlines |
+| `--text-activity-company` | `#646668` | Activity feed company names |
+| `--text-white` | `#FFFFFF` | Timestamps in activity feed |
+| `--deadline-urgent` | `#E35555` | ≤20 days remaining |
+| `--deadline-warning` | `#E19443` | 21-40 days remaining |
+| `--deadline-safe` | `#53BA77` | 40+ days remaining |
 
-### Glass Effect
-```css
-background: linear-gradient(116.79deg, rgba(255,255,255,0.48) 0%, rgba(255,255,255,0.12) 99.45%);
-backdrop-filter: blur(10px);
-```
-Used via: `var(--glass-light)` + `var(--glass-blur)`
+### Glass Effects
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--glass-light` | `linear-gradient(116.79deg, rgba(255,255,255,0.48) 0%, rgba(255,255,255,0.12) 99.45%)` | Panel backgrounds, tables |
+| `--glass-card` | `linear-gradient(116.79deg, rgba(255,255,255,0.64) 0%, rgba(176,173,170,0.8) 99.45%)` | Stats cards (heavier) |
+| `--glass-stroke` | `linear-gradient(108.74deg, rgba(232,216,176,0.6) 2.88%, rgba(0,0,0,0.54) 36.46%, rgba(0,0,0,0.6) 73.96%, rgba(232,216,176,0.6) 100%)` | Divider lines |
+| `--glass-blur` | `blur(10px)` | Cards, panels |
+| `--glass-blur-heavy` | `blur(30px)` | Background wave |
+| `--glass-blur-max` | `blur(75px)` | Full-page overlay |
+
+### Badge Colors
+| Status | Background | Text | Border |
+|--------|-----------|------|--------|
+| Paid | `#DBFCE6` | `#48895F` | — |
+| Sent | `#DAE9FE` | `#5C77C8` | `#AAAEB6` |
+| Overdue | `#FDE1E2` | `#B65656` | — |
 
 ### Border Radius
 | Size | Value | Usage |
 |------|-------|-------|
-| Small | `4px` | Buttons, dropdowns, inputs |
-| Medium | `8px` | Cards, modals |
+| Small | `4px` | Buttons, inputs, nav items |
+| Medium | `8px` | Cards, panels |
+
+---
+
+## Layout
+
+### Sidebar (219px fixed)
+- Background: `--blass-nav` (warm gold, 50% opacity)
+- Drop shadow: `2px 13px 16.9px 8px rgba(0, 0, 0, 0.2)`
+- Top/bottom dividers: `.glass-stroke` (2px gradient)
+- Active nav item: `bg-white/75`, `border-radius: 4px`
+- "New Invoice" button: `--blass-accent-60` bg, neo-brutalist border `1px 3px 3px 1px`
+
+### Content Area
+- Background: `--blass-surface` (cool blue, 30% opacity)
+- Padding: `36px left`, `32px top`
+- Wave overlay behind everything: `--blass-nav` + `blur(30px)`
+
+### Stats Cards
+- 282×86px, `--glass-card` gradient, `blur(10px)`, `border-radius: 8px`
+- No border (glassmorphism only)
+
+### Glass Panels (tables, sections)
+- `--glass-light` gradient, `border-radius: 8px`
+- Section dividers: `.glass-stroke` (2px gradient)
+- Section titles: Inter 16-17px, weight 400
 
 ---
 
 ## Utility Classes
 
-### `.blass-btn` — Depth Button (Static)
-Glass background with neo-brutalist depth border (`1px 4px 4px 1px`).
-- **Hover:** border softens to `1px 2px 2px 1px`, slight translate
-- **Active:** border flattens to `1px`, full translate
+### `.glass-card` — Light Glass Surface
+`--glass-light` + `blur(10px)`, `8px` radius. For tables and content panels.
 
-### `.blass-btn-selected` — Selected/Active State
-Solid muted background (`rgba(245,245,245,0.6)`), flat `1px` border.
-Used when a dropdown is open or a toggle is active.
+### `.glass-card-heavy` — Heavy Glass + Depth Border
+Glass + thick neo-brutalist border (`1px 10px 10px 1px`).
+
+### `.glass-stroke` — Gradient Divider
+2px height, `--glass-stroke` gradient. Used between sidebar sections and inside panels.
+
+### `.blass-btn` — Neo-Brutalist Button
+Glass bg, depth border (`1px 4px 4px 1px`), hover softens, active flattens.
 
 ### `.blass-btn-flat` — Flat Glass Button
-Glass background with uniform `1px` border. No depth effect.
-Used for secondary actions or dropdown menus.
-
-### `.glass-card` — Glass Surface
-Glass background, `8px` radius, no border. For stat cards and content areas.
-
-### `.glass-card-heavy` — Heavy Glass Card
-Glass background with thick depth border (`1px 10px 10px 1px`), `8px` radius.
+Glass bg, uniform `1px` border. Secondary actions.
 
 ---
 
 ## Components
 
-### ActionDropdown
-**File:** `src/components/ActionDropdown.tsx`
-**Figma source:** Component 1
+### Sidebar (`src/components/Sidebar.tsx`)
+Warm gold sidebar with Playfair wordmark, glassmorphic strokes, drop shadow.
 
-Dashboard quick-action dropdown (e.g., "New Invoice", "New Proposal").
+### StatsCard (`src/components/StatsCard.tsx`)
+Glass card with heavier gradient. Props: `title`, `value`, `trend?`, `className?`.
 
-| State | Class | Visual |
-|-------|-------|--------|
-| Static | `.blass-btn` | Glass bg, depth border, chevron down |
-| Hover | `.blass-btn:hover` | Border softens, slight shift |
-| Open | `.blass-btn-selected` | Solid muted bg, chevron rotates 180° |
+### StatusBadge (`src/components/StatusBadge.tsx`)
+Color-coded pill badge for Paid/Sent/Overdue/Draft statuses.
 
-**Props:**
-- `label: string` — Button text
-- `options: { label: string; onClick: () => void }[]` — Dropdown items
-- `className?: string` — Additional styling
+### ActionDropdown (`src/components/ActionDropdown.tsx`)
+Quick-action dropdown (New Invoice, New Proposal, New Contract).
 
-**Usage:**
-```tsx
-<ActionDropdown
-  label="New Invoice"
-  options={[
-    { label: 'Blank Invoice', onClick: () => {} },
-    { label: 'From Template', onClick: () => {} },
-  ]}
-/>
-```
-
-### StatsCard
-**File:** `src/components/StatsCard.tsx`
-
-Glass surface card for dashboard KPI numbers.
-
-### StatusBadge
-**File:** `src/components/StatusBadge.tsx`
-
-Color-coded badge for invoice/task status (Paid, Sent, Overdue).
-
-### EmptyState
-**File:** `src/components/EmptyState.tsx`
-
+### EmptyState (`src/components/EmptyState.tsx`)
 Placeholder for sections with no data.
-
-### Sidebar
-**File:** `src/components/Sidebar.tsx`
-
-Main navigation sidebar.
 
 ---
 
 ## Adding New Components
 
-When adding Figma CSS for a new component:
-1. Extract tokens → check if they already exist in `globals.css`
+1. Extract tokens from Figma CSS → check if they exist in `globals.css`
 2. If new, add as CSS custom properties in `:root`
-3. If a reusable pattern, create a utility class (`.blass-*`)
-4. Build the React component referencing tokens/classes
-5. Document it in this file
+3. Use `--font-heading` (Playfair) for any section heading or page title
+4. Use `--glass-light` for panel backgrounds, `--glass-card` for stat cards
+5. Use `.glass-stroke` for horizontal dividers inside panels
+6. Keep neo-brutalist borders (`1px Npx Npx 1px`) only for primary action buttons
+7. Document the component in this file

@@ -39,10 +39,20 @@ export default function Dashboard() {
 
   return (
     <div className="p-6 pb-12 max-w-[1221px]">
-      {/* Header */}
+      {/* Header — Playfair Display */}
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-black mb-1">Good morning, Josh</h1>
-        <p className="text-xs" style={{ color: '#5E5E5E' }}>{today}</p>
+        <h1
+          className="text-[25px] mb-0.5"
+          style={{
+            fontFamily: 'var(--font-heading)',
+            fontWeight: 400,
+            lineHeight: '33px',
+            color: '#2C313E',
+          }}
+        >
+          Good morning, Josh
+        </h1>
+        <p className="text-[13px] font-normal" style={{ color: '#9EA3AC' }}>{today}</p>
       </div>
 
       {/* Stats Cards Row */}
