@@ -12,35 +12,68 @@ const statusColumns: { status: ProjectStatus; label: string; color: string }[] =
   { status: 'completed', label: 'Completed', color: 'green' },
 ]
 
+const glassPanel = {
+  background: 'linear-gradient(116.79deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.12) 99.45%)',
+  backdropFilter: 'blur(10px)',
+  WebkitBackdropFilter: 'blur(10px)',
+  borderRadius: '8px',
+} as const
+
+const headingStyle = { fontFamily: 'var(--font-heading)', fontWeight: 400, color: '#2C313E' } as const
+
+const primaryBtn = {
+  background: '#2462EB',
+  color: '#fff',
+  borderWidth: '1px 3px 3px 1px',
+  borderColor: '#000',
+  borderStyle: 'solid' as const,
+  borderRadius: '4px',
+} as const
+
+const colorTextMap: Record<string, string> = {
+  blue: '#2563eb',
+  purple: '#9333ea',
+  amber: '#d97706',
+  green: '#16a34a',
+}
+
 function ProjectCard({ project }: { project: typeof mockProjects[0] }) {
   const daysLeft = daysUntil(project.endDate)
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
+    <div
+      className="p-4 hover:shadow-md transition-shadow"
+      style={glassPanel}
+    >
       <div className="mb-3">
-        <p className="text-xs text-gray-500 font-medium uppercase">{project.clientName}</p>
-        <p className="font-bold text-gray-900 mt-1">{project.title}</p>
+        <p style={{ fontSize: '11px', color: '#ADB1B8', fontWeight: 500, textTransform: 'uppercase' }}>{project.clientName}</p>
+        <p style={{ fontFamily: 'var(--font-heading)', fontWeight: 400, color: '#2C313E', fontSize: '15px' }} className="mt-1">{project.title}</p>
       </div>
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-gray-600">
+          <span style={{ fontSize: '12px', color: '#6E727B' }}>
             {daysLeft > 0 ? `Due in ${daysLeft}d` : 'Overdue'}
           </span>
-          <span className={`text-xs font-bold ${daysLeft <= 3 ? 'text-red-600' : 'text-gray-600'}`}>
+          <span style={{ fontSize: '12px', fontWeight: 700, color: daysLeft <= 3 ? '#dc2626' : '#6E727B' }}>
             {formatDate(project.endDate)}
           </span>
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-900">{formatCurrency(project.budget)}</span>
-          <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">{project.progress}%</span>
+          <span style={{ fontSize: '14px', fontWeight: 500, color: '#2C313E' }}>{formatCurrency(project.budget)}</span>
+          <span
+            className="px-2 py-1 rounded"
+            style={{ fontSize: '12px', color: '#6E727B', background: 'rgba(255,255,255,0.4)' }}
+          >
+            {project.progress}%
+          </span>
         </div>
 
-        <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className="w-full rounded-full h-2" style={{ background: 'rgba(0,0,0,0.08)' }}>
           <div
-            className="bg-blue-600 h-2 rounded-full transition-all"
-            style={{ width: `${project.progress}%` }}
+            className="h-2 rounded-full transition-all"
+            style={{ width: `${project.progress}%`, background: '#2462EB' }}
           />
         </div>
       </div>
@@ -54,10 +87,10 @@ export default function ProjectsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Projects</h1>
-          <p className="text-gray-600">Manage your project pipeline</p>
+          <h1 style={{ ...headingStyle, fontSize: '25px' }} className="mb-2">Projects</h1>
+          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '13px', color: '#9EA3AC' }}>Manage your project pipeline</p>
         </div>
-        <button className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors">
+        <button className="flex items-center gap-2 px-6 py-2 font-medium transition-colors" style={primaryBtn}>
           <Plus className="w-5 h-5" />
           New Project
         </button>
@@ -67,18 +100,31 @@ export default function ProjectsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {statusColumns.map((column) => {
           const columnProjects = mockProjects.filter(p => p.status === column.status)
-          const colorMap = {
-            blue: 'bg-blue-50 border-blue-200',
-            purple: 'bg-purple-50 border-purple-200',
-            amber: 'bg-amber-50 border-amber-200',
-            green: 'bg-green-50 border-green-200',
-          }
 
           return (
-            <div key={column.status} className={`${colorMap[column.color as keyof typeof colorMap]} rounded-xl border-2 min-h-96 p-4`}>
+            <div
+              key={column.status}
+              className="min-h-96 p-4"
+              style={{
+                ...glassPanel,
+                border: '1px solid rgba(0,0,0,0.06)',
+              }}
+            >
               <div className="flex items-center justify-between mb-4">
-                <h3 className={`font-bold text-sm text-${column.color}-900`}>{column.label}</h3>
-                <span className={`text-xs font-medium px-2 py-1 bg-${column.color}-100 text-${column.color}-800 rounded`}>
+                <h3
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontWeight: 400,
+                    color: colorTextMap[column.color] || '#2C313E',
+                    fontSize: '14px',
+                  }}
+                >
+                  {column.label}
+                </h3>
+                <span
+                  className="px-2 py-1 rounded"
+                  style={{ fontSize: '12px', fontWeight: 500, color: '#6E727B', background: 'rgba(255,255,255,0.5)' }}
+                >
                   {columnProjects.length}
                 </span>
               </div>
@@ -90,7 +136,7 @@ export default function ProjectsPage() {
               </div>
 
               {columnProjects.length === 0 && (
-                <div className="text-center py-8 text-gray-500 text-sm">
+                <div className="text-center py-8" style={{ fontSize: '13px', color: '#ADB1B8' }}>
                   No projects
                 </div>
               )}
