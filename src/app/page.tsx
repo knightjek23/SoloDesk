@@ -2,53 +2,62 @@
 
 import Link from 'next/link'
 import {
-  FileText,
-  FileSignature,
+  Palette,
+  Music,
+  Camera,
   FolderKanban,
   Receipt,
   Clock,
-  Calculator,
   ArrowRight,
 } from 'lucide-react'
 
 const features = [
   {
-    icon: FileText,
-    title: 'Proposals',
-    description: 'Create professional proposals in minutes. Track status and get client sign-off quickly.',
-  },
-  {
-    icon: FileSignature,
-    title: 'Contracts',
-    description: 'Manage contracts with built-in templates. Digital signatures and automated tracking.',
-  },
-  {
     icon: FolderKanban,
-    title: 'Projects',
-    description: 'Organize all your projects in one place. Kanban boards, timelines, and progress tracking.',
+    title: 'Project Tracking',
+    description: 'Kanban boards built for creative workflows. Track album artwork, video edits, photo shoots, and web builds from brief to delivery.',
   },
   {
     icon: Receipt,
     title: 'Invoicing',
-    description: 'Create and send professional invoices. Track payments and automatically calculate taxes.',
+    description: 'Send professional invoices in seconds. Track who\'s paid, who\'s overdue, and stop chasing payments manually.',
   },
   {
     icon: Clock,
     title: 'Time Tracking',
-    description: 'Log billable hours, track expenses, and generate monthly billing reports.',
+    description: 'Log billable hours per project. Know exactly how much that "quick revision" actually cost you.',
   },
   {
-    icon: Calculator,
-    title: 'Tax Estimates',
-    description: 'Automatic tax calculations and quarterly estimates based on your invoices.',
+    icon: Palette,
+    title: 'Client Management',
+    description: 'One place for every client — contact info, project history, invoices, and notes. No more digging through email threads.',
   },
+  {
+    icon: Camera,
+    title: 'Built for Visual Work',
+    description: 'Designed for photographers, videographers, and designers who think in deliverables, not spreadsheets.',
+  },
+  {
+    icon: Music,
+    title: 'Made for Music',
+    description: 'Track beats sold, sessions booked, and mixing gigs delivered. Finally, a business tool that gets how producers work.',
+  },
+]
+
+const creativeTypes = [
+  { label: 'Web Designers', icon: '🎨' },
+  { label: 'Visual Artists', icon: '🖼️' },
+  { label: 'Music Producers', icon: '🎹' },
+  { label: 'DJs', icon: '🎧' },
+  { label: 'Photographers', icon: '📸' },
+  { label: 'Videographers', icon: '🎬' },
 ]
 
 const pricingPlans = [
   {
-    name: 'Free',
+    name: 'Starter',
     price: '0',
-    description: 'Get started with basic features',
+    description: 'Try it out, no strings attached',
     features: [
       'Up to 5 clients',
       '5 active projects',
@@ -58,43 +67,30 @@ const pricingPlans = [
     ],
   },
   {
-    name: 'Solo',
-    price: '29',
-    description: 'For independent freelancers',
+    name: 'Creative',
+    price: '19',
+    description: 'For working creatives with active clients',
     features: [
       'Unlimited clients',
       'Unlimited projects',
-      'Advanced invoicing',
-      'Proposals & contracts',
+      'Full invoicing + payment tracking',
+      'Time tracking with hourly rates',
+      'Business health dashboard',
       'Priority support',
-      'Custom branding',
     ],
     highlighted: true,
   },
   {
-    name: 'Pro',
-    price: '59',
-    description: 'For growing freelance businesses',
+    name: 'Studio',
+    price: '39',
+    description: 'For studios and creative businesses scaling up',
     features: [
-      'Everything in Solo',
+      'Everything in Creative',
       'Client portal access',
       'Team collaboration',
-      'Custom integrations',
+      'Custom branding',
       'Advanced reporting',
-      '24/7 priority support',
-    ],
-  },
-  {
-    name: 'Agency',
-    price: '99',
-    description: 'For agencies and larger teams',
-    features: [
-      'Everything in Pro',
-      'Unlimited team members',
-      'White-label options',
       'API access',
-      'Advanced automation',
-      'Dedicated account manager',
     ],
   },
 ]
@@ -169,7 +165,7 @@ export default function Home() {
           </span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <Link
-              href="/dashboard"
+              href="/login"
               style={{
                 color: '#000000',
                 fontWeight: 500,
@@ -179,7 +175,7 @@ export default function Home() {
               Sign In
             </Link>
             <Link
-              href="/dashboard"
+              href="/signup"
               style={{
                 ...primaryButton,
                 display: 'inline-flex',
@@ -193,7 +189,6 @@ export default function Home() {
             </Link>
           </div>
         </div>
-        {/* Glass stroke bottom border */}
         <div style={navGlassStroke} />
       </nav>
 
@@ -214,6 +209,18 @@ export default function Home() {
           }}
         >
           <div>
+            <p
+              style={{
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                color: '#2462EB',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                marginBottom: '1rem',
+              }}
+            >
+              Built for creatives, by a creative
+            </p>
             <h1
               style={{
                 fontFamily: 'var(--font-heading)',
@@ -224,7 +231,7 @@ export default function Home() {
                 lineHeight: 1.1,
               }}
             >
-              Your Entire Freelance Business, One Tab.
+              Run Your Creative Business From One Place.
             </h1>
             <p
               style={{
@@ -234,11 +241,11 @@ export default function Home() {
                 lineHeight: 1.7,
               }}
             >
-              From proposals and contracts to invoicing and time tracking, SoloDesk brings all your freelance business tools into one beautiful, intuitive platform. Stop switching between apps. Start getting paid faster.
+              You spend 10+ hours a week on admin instead of creating. SoloDesk handles your clients, projects, invoices, and time tracking so you can focus on the work that matters. No setup consultants. No bloated enterprise tools. Just what creatives actually need.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
               <Link
-                href="/dashboard"
+                href="/signup"
                 style={{
                   ...primaryButton,
                   display: 'inline-flex',
@@ -251,25 +258,9 @@ export default function Home() {
                   fontSize: '1rem',
                 }}
               >
-                Start Free Trial
+                Start Free — No Card Needed
                 <ArrowRight style={{ width: '1.25rem', height: '1.25rem' }} />
               </Link>
-              <button
-                style={{
-                  ...secondaryButton,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.5rem',
-                  padding: '1rem 2rem',
-                  fontWeight: 700,
-                  fontSize: '1rem',
-                  color: '#2C313E',
-                  cursor: 'pointer',
-                }}
-              >
-                Watch Demo
-              </button>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -284,12 +275,76 @@ export default function Home() {
                 borderRadius: '16px',
               }}
             >
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '3.75rem', marginBottom: '1rem' }}>🚀</div>
-                <p style={{ color: '#9EA3AC', fontWeight: 500 }}>App Preview</p>
+              <div style={{ textAlign: 'center', padding: '2rem' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '1rem',
+                    justifyContent: 'center',
+                    marginBottom: '1.5rem',
+                  }}
+                >
+                  {creativeTypes.map((type) => (
+                    <span
+                      key={type.label}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '9999px',
+                        background: 'rgba(255,255,255,0.6)',
+                        fontSize: '0.875rem',
+                        color: '#2C313E',
+                        fontWeight: 500,
+                      }}
+                    >
+                      {type.icon} {type.label}
+                    </span>
+                  ))}
+                </div>
+                <p style={{ color: '#9EA3AC', fontWeight: 500 }}>
+                  One dashboard for every creative discipline
+                </p>
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Social Proof Bar */}
+      <section
+        style={{
+          backgroundColor: 'rgba(232, 216, 176, 0.15)',
+          padding: '2rem 0',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '80rem',
+            margin: '0 auto',
+            padding: '0 1.5rem',
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            gap: '3rem',
+          }}
+        >
+          {[
+            { stat: '85%', label: 'of freelancers deal with late payments' },
+            { stat: '10+ hrs', label: 'per week lost to admin work' },
+            { stat: '$26K', label: 'lost yearly to untracked time' },
+          ].map((item) => (
+            <div key={item.label} style={{ textAlign: 'center' }}>
+              <p style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', fontWeight: 700, color: '#2462EB' }}>
+                {item.stat}
+              </p>
+              <p style={{ fontSize: '0.875rem', color: '#5E5E5E', maxWidth: '16rem' }}>
+                {item.label}
+              </p>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -317,10 +372,10 @@ export default function Home() {
                 marginBottom: '1rem',
               }}
             >
-              Everything You Need to Run Your Business
+              Your Creative Workflow, Simplified
             </h2>
             <p style={{ fontSize: '1.25rem', color: '#9EA3AC' }}>
-              All the tools freelancers and small agencies actually use, in one place.
+              Stop juggling five apps. Everything you need from brief to invoice, in one tab.
             </p>
           </div>
           <div
@@ -378,7 +433,7 @@ export default function Home() {
       <section style={{ padding: '5rem 0' }}>
         <div
           style={{
-            maxWidth: '80rem',
+            maxWidth: '72rem',
             margin: '0 auto',
             padding: '0 1.5rem',
           }}
@@ -393,16 +448,16 @@ export default function Home() {
                 marginBottom: '1rem',
               }}
             >
-              Simple, Transparent Pricing
+              Pricing That Respects Your Hustle
             </h2>
             <p style={{ fontSize: '1.25rem', color: '#9EA3AC' }}>
-              Choose the perfect plan for your business. No hidden fees.
+              No 89% price hikes. No hidden fees. No client caps on the plan that matters.
             </p>
           </div>
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 16rem), 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 18rem), 1fr))',
               gap: '2rem',
             }}
           >
@@ -461,20 +516,24 @@ export default function Home() {
                     <span style={{ color: '#9EA3AC' }}>/month</span>
                   )}
                 </div>
-                <button
+                <Link
+                  href="/signup"
                   style={{
+                    display: 'block',
                     width: '100%',
                     padding: '0.75rem',
                     fontWeight: 700,
                     marginBottom: '1.5rem',
                     cursor: 'pointer',
                     fontSize: '1rem',
+                    textAlign: 'center',
+                    textDecoration: 'none',
                     ...(plan.highlighted ? primaryButton : secondaryButton),
                     color: plan.highlighted ? '#FFFFFF' : '#2C313E',
                   }}
                 >
                   Get Started
-                </button>
+                </Link>
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                   {plan.features.map((feature) => (
                     <li
@@ -549,7 +608,7 @@ export default function Home() {
               >
                 SoloDesk
               </div>
-              <p style={{ color: '#ADB1B8' }}>The all-in-one platform for freelancers.</p>
+              <p style={{ color: '#ADB1B8' }}>The business dashboard for independent creatives.</p>
             </div>
             <div>
               <h4
@@ -575,12 +634,13 @@ export default function Home() {
                   marginBottom: '1rem',
                 }}
               >
-                Company
+                For Creatives
               </h4>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <li><a href="#" style={{ color: '#ADB1B8', textDecoration: 'none' }}>About</a></li>
-                <li><a href="#" style={{ color: '#ADB1B8', textDecoration: 'none' }}>Blog</a></li>
-                <li><a href="#" style={{ color: '#ADB1B8', textDecoration: 'none' }}>Contact</a></li>
+                <li><a href="#" style={{ color: '#ADB1B8', textDecoration: 'none' }}>Designers</a></li>
+                <li><a href="#" style={{ color: '#ADB1B8', textDecoration: 'none' }}>Photographers</a></li>
+                <li><a href="#" style={{ color: '#ADB1B8', textDecoration: 'none' }}>Music Producers</a></li>
+                <li><a href="#" style={{ color: '#ADB1B8', textDecoration: 'none' }}>Videographers</a></li>
               </ul>
             </div>
             <div>

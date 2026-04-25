@@ -1,28 +1,83 @@
-'use client'
-
 import {
-  FolderKanban,
-  Receipt,
-  Clock,
-  FileText,
   ChevronDown,
 } from 'lucide-react'
+import { createClient } from '@/lib/supabase/server'
 import { StatsCard } from '@/components/StatsCard'
 import { StatusBadge } from '@/components/StatusBadge'
 import { formatCurrency, formatDate, daysUntil } from '@/lib/utils'
-import { mockInvoices, mockProjects } from '@/lib/mock-data'
 
-export default function Dashboard() {
-  const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-  const activeProjects = mockProjects.filter(p => p.status === 'active' || p.status === 'in_progress')
-  const outstandingTotal = mockInvoices
-    .filter(inv => inv.status === 'sent' || inv.status === 'overdue')
-    .reduce((sum, inv) => sum + inv.total, 0)
-  const recentInvoices = mockInvoices.slice(0, 4)
-  const upcomingDeadlines = mockProjects
-    .filter(p => p.status !== 'completed' && p.status !== 'archived')
-    .sort((a, b) => new Date(a.endDate).getTime() - new Date(b.endDate).getTime())
+export const dynamic = 'force-dynamic'
+
+export default async function Dashboard() {
+  const supabase = await createClient()
+
+  // Current month boundaries for time entries query
+  const now = new Date()
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).toISOString()
+
+  const [userRes, projectsRes, invoicesRes, timeRes, clientsRes] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase
+      .from('projects')
+      .select('id, client_id, title, status, end_date')
+      .order('end_date', { ascending: true }),
+    supabase
+      .from('invoices')
+      .select('id, client_id, invoice_number, status, total, due_date')
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('time_entries')
+      .select('hours')
+      .gte('entry_date', monthStart)
+      .lte('entry_date', monthEnd),
+    supabase
+      .from('clients')
+      .select('id, name, company'),
+  ])
+
+  const userName = userRes.data?.user?.user_metadata?.name ?? 'there'
+  const projects = projectsRes.data ?? []
+  const invoices = invoicesRes.data ?? []
+  const timeEntries = timeRes.data ?? []
+  const clients = clientsRes.data ?? []
+
+  // Build client lookup map
+  const clientMap = new Map<string, { name: string; company: string | null }>()
+  for (const c of clients) {
+    clientMap.set(c.id, { name: c.name, company: c.company })
+  }
+
+  // Stats computations
+  const activeProjects = projects.filter(
+    (p) => p.status === 'active' || p.status === 'in_progress'
+  )
+  const outstandingTotal = invoices
+    .filter((inv) => inv.status === 'sent' || inv.status === 'overdue')
+    .reduce((sum, inv) => sum + Number(inv.total ?? 0), 0)
+  const hoursThisMonth = timeEntries.reduce(
+    (sum, te) => sum + Number(te.hours ?? 0),
+    0
+  )
+
+  // Recent invoices — first 4
+  const recentInvoices = invoices.slice(0, 4)
+
+  // Upcoming deadlines — non-completed projects sorted by end_date, top 5
+  const upcomingDeadlines = projects
+    .filter((p) => p.status !== 'completed' && p.status !== 'archived' && p.end_date)
     .slice(0, 5)
+
+  // Greeting time of day
+  const hour = now.getHours()
+  const greeting =
+    hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+
+  const today = now.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  })
 
   // Deadline day color based on urgency
   const getDaysColor = (days: number) => {
@@ -50,9 +105,11 @@ export default function Dashboard() {
             color: '#2C313E',
           }}
         >
-          Good morning, Josh
+          {greeting}, {userName}
         </h1>
-        <p className="text-[13px] font-normal" style={{ color: '#9EA3AC' }}>{today}</p>
+        <p className="text-[13px] font-normal" style={{ color: '#9EA3AC' }}>
+          {today}
+        </p>
       </div>
 
       {/* Stats Cards Row */}
@@ -60,22 +117,18 @@ export default function Dashboard() {
         <StatsCard
           title="Active Projects"
           value={activeProjects.length.toString()}
-          trend={{ value: '+1 this month', positive: true }}
         />
         <StatsCard
           title="Outstanding"
           value={formatCurrency(outstandingTotal)}
-          trend={{ value: '+$1,200 this month', positive: false }}
         />
         <StatsCard
           title="Hours This Month"
-          value="47.5h"
-          trend={{ value: '+12h vs last month', positive: true }}
+          value={`${hoursThisMonth.toFixed(1)}h`}
         />
         <StatsCard
           title="Pending Proposals"
-          value="2"
-          trend={{ value: '-1 this month', positive: true }}
+          value={'\u2014'}
         />
       </div>
 
@@ -102,7 +155,8 @@ export default function Dashboard() {
           <div
             className="absolute inset-0"
             style={{
-              background: 'linear-gradient(116.79deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.12) 99.45%)',
+              background:
+                'linear-gradient(116.79deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.12) 99.45%)',
               border: '1px solid #000',
               borderRadius: '8px',
               zIndex: 0,
@@ -111,81 +165,104 @@ export default function Dashboard() {
           <div className="relative z-10">
             {/* Header */}
             <div className="px-4 py-2.5 flex items-center">
-              <h2 className="text-[17px] font-normal text-black">Recent Invoices</h2>
+              <h2 className="text-[17px] font-normal text-black">
+                Recent Invoices
+              </h2>
             </div>
             {/* Separator bar */}
             <div
               className="w-full h-[6px]"
-              style={{ background: 'linear-gradient(90deg, rgba(90,79,207,0.2), rgba(232,237,255,0.15))', border: '1px solid #000', borderLeft: 'none', borderRight: 'none' }}
+              style={{
+                background:
+                  'linear-gradient(90deg, rgba(90,79,207,0.2), rgba(232,237,255,0.15))',
+                border: '1px solid #000',
+                borderLeft: 'none',
+                borderRight: 'none',
+              }}
             />
             {/* Invoice rows */}
             <div className="flex flex-col gap-2 py-3">
-              {recentInvoices.map((invoice) => (
-                <div
-                  key={invoice.id}
-                  className="flex items-center px-4 py-1 hover:bg-white/10 transition-colors"
-                  style={{ gap: '93px' }}
+              {recentInvoices.length === 0 && (
+                <p
+                  className="px-4 py-2 text-[13px]"
+                  style={{ color: '#9EA3AC' }}
                 >
-                  {/* Invoice number — gradient text fill */}
-                  <span
-                    className="text-[11px] font-normal min-w-[44px]"
-                    style={{
-                      background: 'linear-gradient(116.79deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.12) 99.45%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
-                      border: '1px solid #000',
-                      padding: '0 4px',
-                    }}
+                  No invoices yet
+                </p>
+              )}
+              {recentInvoices.map((invoice) => {
+                const client = clientMap.get(invoice.client_id)
+                return (
+                  <div
+                    key={invoice.id}
+                    className="flex items-center px-4 py-1 hover:bg-white/10 transition-colors"
+                    style={{ gap: '93px' }}
                   >
-                    {invoice.invoiceNumber}
-                  </span>
-                  {/* Client — gradient text fill */}
-                  <span
-                    className="text-[11px] font-normal min-w-[90px]"
-                    style={{
-                      background: 'linear-gradient(116.79deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.12) 99.45%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
-                      border: '1px solid #000',
-                      padding: '0 4px',
-                    }}
-                  >
-                    {invoice.clientName}
-                  </span>
-                  {/* Amount — gradient text fill */}
-                  <span
-                    className="text-[11px] font-normal min-w-[57px]"
-                    style={{
-                      background: 'linear-gradient(116.79deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.12) 99.45%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
-                      border: '1px solid #000',
-                      padding: '0 4px',
-                    }}
-                  >
-                    ${invoice.total.toFixed(2)}
-                  </span>
-                  {/* Status badge */}
-                  <StatusBadge status={invoice.status} />
-                  {/* Date — gradient text fill */}
-                  <span
-                    className="text-[11px] font-normal min-w-[74px]"
-                    style={{
-                      background: 'linear-gradient(116.79deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.12) 99.45%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
-                      border: '1px solid #000',
-                      padding: '0 4px',
-                    }}
-                  >
-                    {formatDate(invoice.dueDate)}
-                  </span>
-                </div>
-              ))}
+                    {/* Invoice number — gradient text fill */}
+                    <span
+                      className="text-[11px] font-normal min-w-[44px]"
+                      style={{
+                        background:
+                          'linear-gradient(116.79deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.12) 99.45%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                        border: '1px solid #000',
+                        padding: '0 4px',
+                      }}
+                    >
+                      {invoice.invoice_number}
+                    </span>
+                    {/* Client — gradient text fill */}
+                    <span
+                      className="text-[11px] font-normal min-w-[90px]"
+                      style={{
+                        background:
+                          'linear-gradient(116.79deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.12) 99.45%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                        border: '1px solid #000',
+                        padding: '0 4px',
+                      }}
+                    >
+                      {client?.name ?? 'Unknown'}
+                    </span>
+                    {/* Amount — gradient text fill */}
+                    <span
+                      className="text-[11px] font-normal min-w-[57px]"
+                      style={{
+                        background:
+                          'linear-gradient(116.79deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.12) 99.45%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                        border: '1px solid #000',
+                        padding: '0 4px',
+                      }}
+                    >
+                      ${Number(invoice.total ?? 0).toFixed(2)}
+                    </span>
+                    {/* Status badge */}
+                    <StatusBadge status={invoice.status} />
+                    {/* Date — gradient text fill */}
+                    <span
+                      className="text-[11px] font-normal min-w-[74px]"
+                      style={{
+                        background:
+                          'linear-gradient(116.79deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.12) 99.45%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                        border: '1px solid #000',
+                        padding: '0 4px',
+                      }}
+                    >
+                      {invoice.due_date ? formatDate(invoice.due_date) : '\u2014'}
+                    </span>
+                  </div>
+                )
+              })}
             </div>
           </div>
         </div>
@@ -195,7 +272,8 @@ export default function Dashboard() {
           <div
             className="absolute inset-0"
             style={{
-              background: 'linear-gradient(116.79deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.12) 99.45%)',
+              background:
+                'linear-gradient(116.79deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.12) 99.45%)',
               border: '1px solid #000',
               borderRadius: '8px',
               zIndex: 0,
@@ -204,17 +282,37 @@ export default function Dashboard() {
           <div className="relative z-10">
             {/* Header */}
             <div className="px-4 py-2.5">
-              <h2 className="text-[16px] font-normal text-black">Upcoming Deadlines</h2>
+              <h2 className="text-[16px] font-normal text-black">
+                Upcoming Deadlines
+              </h2>
             </div>
             {/* Separator bar */}
             <div
               className="w-full h-[6px]"
-              style={{ background: 'linear-gradient(90deg, rgba(90,79,207,0.2), rgba(232,237,255,0.15))', border: '1px solid #000', borderLeft: 'none', borderRight: 'none' }}
+              style={{
+                background:
+                  'linear-gradient(90deg, rgba(90,79,207,0.2), rgba(232,237,255,0.15))',
+                border: '1px solid #000',
+                borderLeft: 'none',
+                borderRight: 'none',
+              }}
             />
             {/* Deadline items — flex column, 24px gap, no progress bars */}
-            <div className="flex flex-col items-end px-5 py-4" style={{ gap: '24px' }}>
+            <div
+              className="flex flex-col items-end px-5 py-4"
+              style={{ gap: '24px' }}
+            >
+              {upcomingDeadlines.length === 0 && (
+                <p
+                  className="text-[13px] w-full"
+                  style={{ color: '#9EA3AC' }}
+                >
+                  No upcoming deadlines
+                </p>
+              )}
               {upcomingDeadlines.map((project) => {
-                const daysLeft = daysUntil(project.endDate)
+                const daysLeft = daysUntil(project.end_date!)
+                const client = clientMap.get(project.client_id)
                 return (
                   <div
                     key={project.id}
@@ -224,7 +322,11 @@ export default function Dashboard() {
                     <div className="flex flex-col gap-[1px]">
                       <p
                         className="text-[13px] font-normal"
-                        style={{ color: '#6D717A', border: '1px solid #000', lineHeight: '16px' }}
+                        style={{
+                          color: '#6D717A',
+                          border: '1px solid #000',
+                          lineHeight: '16px',
+                        }}
                       >
                         {project.title}
                       </p>
@@ -236,7 +338,7 @@ export default function Dashboard() {
                           lineHeight: '13px',
                         }}
                       >
-                        {project.clientName}
+                        {client?.company ?? client?.name ?? 'Unknown'}
                       </p>
                     </div>
                     {/* Right: days count */}
@@ -264,7 +366,8 @@ export default function Dashboard() {
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(116.79deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.12) 99.45%)',
+            background:
+              'linear-gradient(116.79deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.12) 99.45%)',
             border: '1px solid #000',
             borderRadius: '8px',
             zIndex: 0,
@@ -279,15 +382,30 @@ export default function Dashboard() {
             >
               Activity Feed
             </h2>
-            <div className="w-full h-[3px]" style={{ background: '#49494F' }} />
+            <div
+              className="w-full h-[3px]"
+              style={{ background: '#49494F' }}
+            />
           </div>
 
-          {/* Activity items */}
+          {/* Activity items — static for MVP */}
           <div className="py-2">
             {[
-              { action: 'Invoice INV-006 sent', company: 'Santos Architecture', time: '2 hours ago' },
-              { action: 'Payment received for INV-001', company: 'Bright Digital Co', time: '5 hours ago' },
-              { action: 'New proposal submitted', company: 'Velocity Startups', time: '1 day ago' },
+              {
+                action: 'Invoice INV-006 sent',
+                company: 'Santos Architecture',
+                time: '2 hours ago',
+              },
+              {
+                action: 'Payment received for INV-001',
+                company: 'Bright Digital Co',
+                time: '5 hours ago',
+              },
+              {
+                action: 'New proposal submitted',
+                company: 'Velocity Startups',
+                time: '1 day ago',
+              },
             ].map((item, idx) => (
               <div
                 key={idx}
@@ -296,13 +414,21 @@ export default function Dashboard() {
                 <div className="flex flex-col gap-[1px]">
                   <p
                     className="text-[13px]"
-                    style={{ fontWeight: 400, color: '#000000', lineHeight: '16px' }}
+                    style={{
+                      fontWeight: 400,
+                      color: '#000000',
+                      lineHeight: '16px',
+                    }}
                   >
                     {item.action}
                   </p>
                   <p
                     className="text-[12px]"
-                    style={{ fontWeight: 300, color: '#646668', lineHeight: '15px' }}
+                    style={{
+                      fontWeight: 300,
+                      color: '#646668',
+                      lineHeight: '15px',
+                    }}
                   >
                     {item.company}
                   </p>

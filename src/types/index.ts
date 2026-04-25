@@ -10,7 +10,7 @@ export interface Client {
   name: string
   email: string
   phone: string
-  company: string
+  company: string | null
   address: string
   notes: string
   createdAt: string
