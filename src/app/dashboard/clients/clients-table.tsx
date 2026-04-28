@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import Link from 'next/link'
 import { Search } from 'lucide-react'
 import { getInitials, formatCurrency } from '@/lib/utils'
 
@@ -81,7 +82,7 @@ export function ClientsTable({ clients }: { clients: ClientRow[] }) {
                 filtered.map((client) => (
                   <tr key={client.id} className="hover:bg-white/30 transition-colors">
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
+                      <Link href={`/dashboard/clients/${client.id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                         <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
                           <span className="text-sm font-bold text-blue-800">
                             {getInitials(client.name)}
@@ -91,7 +92,7 @@ export function ClientsTable({ clients }: { clients: ClientRow[] }) {
                           <p className="font-medium" style={{ color: '#2C313E' }}>{client.name}</p>
                           <p style={{ fontSize: '12px', color: '#ADB1B8' }}>{client.company ?? '\u2014'}</p>
                         </div>
-                      </div>
+                      </Link>
                     </td>
                     <td className="px-6 py-4" style={{ color: '#6E727B' }}>{client.email ?? '\u2014'}</td>
                     <td className="px-6 py-4" style={{ color: '#6E727B' }}>{client.phone ?? '\u2014'}</td>
@@ -107,12 +108,13 @@ export function ClientsTable({ clients }: { clients: ClientRow[] }) {
                       {formatCurrency(client.total_billed)}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button className="font-medium text-sm mr-4" style={{ color: '#2462EB' }}>
+                      <Link
+                        href={`/dashboard/clients/${client.id}`}
+                        className="font-medium text-sm"
+                        style={{ color: '#2462EB' }}
+                      >
                         View
-                      </button>
-                      <button className="font-medium text-sm" style={{ color: '#6E727B' }}>
-                        Edit
-                      </button>
+                      </Link>
                     </td>
                   </tr>
                 ))
